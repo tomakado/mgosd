@@ -2,7 +2,7 @@
 
 Tiny concurrent and scheduled dump creator for MongoDB.
 
-Current stable version: 1.1.0.
+Current stable version: [v1.1.0](https://github.com/ildarkarymoff/mgosd/releases/tag/v1.1.0)
 
 Licensed under GNU GPLv3.
 
