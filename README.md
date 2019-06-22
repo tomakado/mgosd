@@ -18,7 +18,7 @@ If you're on Linux, just clone this repo and then you can find Linux executable 
 
 If you're on Mac or Windows:
 1. Install Go compiler (1.12.6+)
-2. Install `mgo` dependency by running `github.com/globalsign/mgo`
+2. Install `mgo` dependency by running `go get sgithub.com/globalsign/mgo`
 3. Compile **mgosd** by running `go build main.go`
 4. Done!
 
@@ -34,6 +34,7 @@ $ ./mgosd -h
 +----------------------------------------+
 | mgosd (c) Ildar Karymov, 2019          |
 | https://github.com/ildarkarymoff/mgosd |
+| License: GNU GPLv3                     |
 | Version: 1.1.0                         |
 +----------------------------------------+
 Usage of ./mgosd:
