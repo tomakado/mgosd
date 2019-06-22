@@ -18,7 +18,7 @@ If you're on Linux, just clone this repo and then you can find Linux executable 
 
 If you're on Mac or Windows:
 1. Install Go compiler (1.12.6+)
-2. Install `mgo` dependency by running `go get sgithub.com/globalsign/mgo`
+2. Install `mgo` dependency by running `go get github.com/globalsign/mgo`
 3. Compile **mgosd** by running `go build main.go`
 4. Done!
 
