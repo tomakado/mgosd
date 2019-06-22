@@ -688,7 +688,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/globalsign/mgo"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/globalsign/mgo/bson"
 	"io/ioutil"
 	"log"
 	"os"

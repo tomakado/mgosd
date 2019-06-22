@@ -733,16 +733,15 @@ func main() {
 	if len(os.Args) > 1 {
 		configPath := os.Args[1]
 
-		if _, err := os.Stat(configPath); os.IsExist(err) {
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			log.Fatalln(err)
+		} else {
 			rawConfig, err := ioutil.ReadFile(configPath)
 			err = json.Unmarshal(rawConfig, &config)
 			if err != nil {
 				log.Printf("Failed to read config file: %v", err)
 			}
-		} else {
-			log.Fatalln("Failed to read config file: file not exists")
 		}
-
 	}
 
 	if login != "<empty>" || password != "<empty>" {
@@ -751,13 +750,13 @@ func main() {
 		config.DB.Auth = true
 	}
 
-	fmt.Println("\n mgsod will work with following parameters:")
+	fmt.Println("\n mgosd will work with following parameters:")
 	fmt.Printf(" * Database host: %s\n", config.DB.Host)
 	fmt.Printf(" * Database port: %d\n", config.DB.Port)
 	fmt.Printf(" * Database authentication: %v\n", config.DB.Auth)
 	fmt.Printf(" * Collections (%d): %v\n", len(config.Collections), config.Collections)
 	fmt.Printf(" * Dump interval: %s\n", config.Interval)
-	fmt.Printf(" * OutputPath path: %s\n\n", config.Output)
+	fmt.Printf(" * Output path: %s\n\n", config.Output)
 
 	var (
 		wg    sync.WaitGroup
