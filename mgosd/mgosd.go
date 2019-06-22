@@ -680,6 +680,7 @@ Public License instead of this License.  But first, please read
 
 */
 
+// Package mgosd provides types and main functionality of mgosd software.
 package mgosd
 
 import (
@@ -714,18 +715,18 @@ type MongoDBConfig struct {
 
 type Dumper struct {
 	dbClient       mgo.Session
-	mutex          *sync.Mutex
+	mutex          *sync.Mutex // Necessary for concurrent work with file system.
 	collection     string
 	ticker         time.Ticker
 	DatabaseConfig MongoDBConfig
-	Output         string
+	OutputPath     string
 }
 
 func NewDumper(dbConfig MongoDBConfig, interval time.Duration, output string) (*Dumper, error) {
 	d := Dumper{
 		ticker:         *time.NewTicker(interval),
 		DatabaseConfig: dbConfig,
-		Output:         output,
+		OutputPath:     output,
 	}
 
 	return &d, nil
@@ -751,7 +752,9 @@ func (d *Dumper) Start(mutex *sync.Mutex, collection string) error {
 		var docs []bson.M
 		err := c.Find(bson.M{}).All(&docs)
 		if err != nil {
-			errStr := fmt.Sprintf("Failed to fetch documents from collection '%s'\n%v", collection, err)
+			errStr := fmt.Sprintf(
+				"Failed to fetch documents from collection '%s'\n%v",
+				collection, err)
 			return errors.New(errStr)
 		}
 
@@ -781,6 +784,7 @@ func (d *Dumper) initSession() error {
 	return nil
 }
 
+// makeConnectionUrl() builds connection url string depending on auth enabled or not
 func (d *Dumper) makeConnectionUrl() string {
 	var url string
 
@@ -801,6 +805,8 @@ func (d *Dumper) makeConnectionUrl() string {
 	return url
 }
 
+// processDocuments transforms field containing ObjectID
+// to be properly importable via mongoimport tool
 func (d *Dumper) processDocuments(docs *[]bson.M) {
 	for _, doc := range *docs {
 		keys := reflect.ValueOf(doc).MapKeys()
@@ -848,19 +854,21 @@ func (d *Dumper) resolvePath() (string, error) {
 		now.Second(),
 	)
 
-	dirPath := d.Output + "/" + timeSignature
+	dirPath := d.OutputPath + "/" + timeSignature
 	filePath := dirPath + "/" + d.collection + ".json"
 
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
-	if _, err := os.Stat(d.Output); os.IsNotExist(err) {
-		err = os.MkdirAll(d.Output, os.ModePerm)
+	// Create OutputPath directory if not exists
+	if _, err := os.Stat(d.OutputPath); os.IsNotExist(err) {
+		err = os.MkdirAll(d.OutputPath, os.ModePerm)
 		if err != nil {
 			return "", err
 		}
 	}
 
+	// Create directory for dump if not exists
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
 		err = os.MkdirAll(dirPath, os.ModePerm)
 		if err != nil {
@@ -873,4 +881,5 @@ func (d *Dumper) resolvePath() (string, error) {
 
 func (d *Dumper) Stop() {
 	d.ticker.Stop()
+	d.dbClient.Close()
 }

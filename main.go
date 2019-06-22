@@ -660,7 +660,7 @@ notice like this when it starts in an interactive mode:
     <program>  Copyright (C) <year>  <name of author>
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
-    under certain conditions; type `show c' for details.
+    under certain conditions; type `show c' for details.log.Fatalln(err)
 
 The hypothetical commands `show w' and `show c' should show the appropriate
 parts of the General Public License.  Of course, your program's commands
@@ -733,12 +733,16 @@ func main() {
 	if len(os.Args) > 1 {
 		configPath := os.Args[1]
 
-		rawConfig, err := ioutil.ReadFile(configPath)
-		err = json.Unmarshal(rawConfig, &config)
-		if err != nil {
-			log.Println("Failed to read config file. Make sure file exists and has right format (JSON).")
-			log.Fatalln(err)
+		if _, err := os.Stat(configPath); os.IsExist(err) {
+			rawConfig, err := ioutil.ReadFile(configPath)
+			err = json.Unmarshal(rawConfig, &config)
+			if err != nil {
+				log.Printf("Failed to read config file: %v", err)
+			}
+		} else {
+			log.Fatalln("Failed to read config file: file not exists")
 		}
+
 	}
 
 	if login != "<empty>" || password != "<empty>" {
@@ -753,7 +757,7 @@ func main() {
 	fmt.Printf(" * Database authentication: %v\n", config.DB.Auth)
 	fmt.Printf(" * Collections (%d): %v\n", len(config.Collections), config.Collections)
 	fmt.Printf(" * Dump interval: %s\n", config.Interval)
-	fmt.Printf(" * Output path: %s\n\n", config.Output)
+	fmt.Printf(" * OutputPath path: %s\n\n", config.Output)
 
 	var (
 		wg    sync.WaitGroup
