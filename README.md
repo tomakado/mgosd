@@ -97,6 +97,7 @@ $ ./mgosd config.json
 
 ## Roadmap
 
+* Streamed reading from MongoDB
 * Switch to official MongoDB driver for Go
 * Ability to configure the schedule in absolute way (implicit time of day)
 * Binary executables for Mac and Windows
